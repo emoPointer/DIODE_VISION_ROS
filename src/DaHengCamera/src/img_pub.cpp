@@ -319,8 +319,8 @@ int main(int argc, char** argv)
     ros::init(argc, argv, "img_pub"); // 初始化ROS节点
     ros::NodeHandle nh;
     image_transport::ImageTransport it(nh);
-    image_transport::Publisher image_pub = it.advertise("camera/image_raw", 1); // 创建图像发布者
-    
+    image_transport::Publisher image_pub = it.advertise("camera/image_raw", 1); // 创建图像发布者 话题名称为camera/image_raw 
+                                                                                // TODO:作为外参引入
 
     ros::Rate loop_rate(100); // 发布频率为100Hz
     while (nh.ok())

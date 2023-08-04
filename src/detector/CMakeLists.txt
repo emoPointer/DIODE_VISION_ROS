@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.2)
-project(Serial)
+project(detector)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
@@ -8,14 +8,17 @@ project(Serial)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  # serial
+  cv_bridge
+  image_transport
   roscpp
   rospy
+  sensor_msgs
   std_msgs
-  serial
 )
-# find_package(serial REQUIRED)
-add_compile_options(-g -std=c++11)
+find_package(OpenCV REQUIRED)
+set(CMAKE_PREFIX_PATH /opt/intel/openvino_2021/deployment_tools/inference_engine/share)
+find_package(InferenceEngine REQUIRED)
+find_package(Eigen3 REQUIRED)
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 
@@ -52,7 +55,8 @@ add_compile_options(-g -std=c++11)
 ## Generate messages in the 'msg' folder
 # add_message_files(
 #   FILES
-#   serial.msg
+#   Message1.msg
+#   Message2.msg
 # )
 
 ## Generate services in the 'srv' folder
@@ -106,7 +110,7 @@ add_compile_options(-g -std=c++11)
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
 #  INCLUDE_DIRS include
-#  LIBRARIES serial
+#  LIBRARIES detector
 #  CATKIN_DEPENDS roscpp rospy std_msgs
 #  DEPENDS system_lib
 )
@@ -120,12 +124,15 @@ catkin_package(
 include_directories(
   include
   ${catkin_INCLUDE_DIRS}
+  ${OpenCV_INCLUDE_DIRS}
 )
-include_directories(include/${PROJECT_NAME})
-# include_directories(/home/dhu/rm_ws/devel/include/rm_msgs)
+# include_directories(${OpenCV_INCLUDE_DIRS})
+include_directories(${EIGEN3_INCLUDE_DIRS})
+include_directories(${InferenceEngine_INCLUDE_DIRS})
+
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/serial.cpp
+#   src/${PROJECT_NAME}/detector.cpp
 # )
 
 ## Add cmake target dependencies of the library
@@ -136,7 +143,7 @@ include_directories(include/${PROJECT_NAME})
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-add_executable(${PROJECT_NAME}_receive_node src/serial_receive.cpp)
+add_executable(${PROJECT_NAME}_node src/inference.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -146,12 +153,13 @@ add_executable(${PROJECT_NAME}_receive_node src/serial_receive.cpp)
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
-add_dependencies(${PROJECT_NAME}_receive_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(${PROJECT_NAME}_receive_node
+target_link_libraries(${PROJECT_NAME}_node
   ${catkin_LIBRARIES}
-  serial
+  ${InferenceEngine_LIBRARIES} 
+  ${Eigen3_LIBRARIES}
 )
 
 #############
@@ -201,7 +209,7 @@ target_link_libraries(${PROJECT_NAME}_receive_node
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_serial.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_detector.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()
