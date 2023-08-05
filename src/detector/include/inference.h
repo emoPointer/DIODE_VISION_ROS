@@ -94,5 +94,7 @@ struct GridAndStride
     int grid1;
     int stride;
 };
-float calcTriangleArea(cv::Point2f pts[3]);
+
+
+float calcTriangleArea(cv::Point2f pts[3]);     //计算面积
 float calcTetragonArea(cv::Point2f pts[4]);

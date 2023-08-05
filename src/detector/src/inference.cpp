@@ -755,7 +755,7 @@ bool BuffDetector::detect(cv::Mat &src,std::vector<BuffObject>& objects)
     // const Blob::Ptr output_blob = infer_request.GetBlob(output_name);
     // MemoryBlob::CPtr moutput = as<MemoryBlob>(output_blob);
 
-    auto moutputHolder = moutput->rmap();   //有问题
+    auto moutputHolder =  moutput->rmap();   //有问题
     const float* net_pred = moutputHolder.as<const PrecisionTrait<InferenceEngine::Precision::FP32>::value_type*>();
     int img_w = src.cols;
     int img_h = src.rows;
